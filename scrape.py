@@ -42,7 +42,7 @@ def main():
 				e = {"name":entry[0][1], "qty":entry[0][2], "price":entry[0][3]}
 				for key in e:
 					if e[key] != item[key]:
-						print "%s CHANGED!!! WAS %s now is %s" %(key, str(e[key]), str(item[key]))
+						print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(key, item['name'], str(e[key]), str(item[key]))
 						changed=1
 				c.execute("UPDATE beers SET name=?, qty=?, price=?, last_updated=? WHERE id = ?", [item['name'], item['qty'], item['price'], now, entry[0][0]])
 				if changed == 0:
