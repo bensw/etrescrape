@@ -6,8 +6,8 @@ import datetime
 
 """CREATE TABLE beers (id INTEGER PRIMARY KEY, name text, qty real, price real,last_updated text);"""
 
-URLS = ["http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=14", #Cantillon
-		"http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=3"]  #3F
+URLS = ["http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=14", # Cantillon
+		"http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=3"]  # 3F
 
 def total_items(soup):
 	return soup.select("#productsListingTopNumber")[0].select("strong:nth-of-type(3)")[0].text
@@ -30,8 +30,17 @@ def main():
 	c = conn.cursor()
 	for url in URLS:
 		soup = bs4(urllib2.urlopen(url).read())
-		print "Found %s Items...." % (total_items(soup))
+		print "Found %s Items..." % (total_items(soup))
 		items = get_items(soup)
+
+		## See if there are multiple pages		
+		page = 2
+		while (int(total_items(soup)) > len(items)):
+			print total_items(soup), len(items), page
+			items += get_items(bs4(urllib2.urlopen(url + "&sort=20a&page=%d" % page ).read()))
+			page += 1
+
+		# Loop over beers found
 		for item in items:
 			entry = c.execute("select * from beers where name = ?", [item['name']]).fetchall()
 			if (len(entry) == 0):
