@@ -42,23 +42,25 @@ def main():
 
 		# Loop over beers found
 		for item in items:
+			# See if the beer exists in the database
 			entry = c.execute("select * from beers where name = ?", [item['name']]).fetchall()
-			if (len(entry) == 0):
+			if (len(entry) == 0): # If it doesn't insert it into the data base 
 				c.execute("INSERT INTO beers (last_updated, name, qty, price) VALUES (?, ?, ?, ?)", [now, item['name'], item['qty'], item['price']])
-				print ("Inserted name=%s qty=%d price=%f" %(item['name'], item['qty'], item['price']))
-			elif (len(entry) == 1):
-				changed=0
+				print "New beer found! name: %s qty: %d price: %f" % (item['name'], item['qty'], item['price'])
+			elif (len(entry) == 1): # If it does exist
+				changed = False #Key to see if anything has been changed
+				# Disgusting map of list object to dictionary
 				e = {"name":entry[0][1], "qty":entry[0][2], "price":entry[0][3]}
+				
+				# Loop over the keys
 				for key in e:
 					if e[key] != item[key]:
 						print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(key, item['name'], str(e[key]), str(item[key]))
-						changed=1
+						changed = True
 				c.execute("UPDATE beers SET name=?, qty=?, price=?, last_updated=? WHERE id = ?", [item['name'], item['qty'], item['price'], now, entry[0][0]])
-				if changed == 0:
+				if changed == False:
 					print "NOTHING CHANGED for beer %s" %(item['name'])
 
-
-#			print "%s:%d Remaining: Cost:%f" %(item['name'], item['quantity'], item['price'])
 	conn.commit()
 	conn.close()
 
