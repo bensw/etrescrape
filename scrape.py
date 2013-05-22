@@ -26,7 +26,7 @@ def get_items(soup):
 
 def main():
 	now = str(datetime.datetime.now())
-	conn = sqlite3.connect("example.db")
+	conn = sqlite3.connect("scrape.db")
 	c = conn.cursor()
 	for url in URLS:
 		soup = bs4(urllib2.urlopen(url).read())
