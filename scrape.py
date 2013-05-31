@@ -27,7 +27,10 @@ def get_items(soup):
 def main():
 	now = str(datetime.datetime.now())
 	conn = sqlite3.connect("scrape.db")
+	conn.row_factory=sqlite3.Row
 	c = conn.cursor()
+	changes = {}
+	new_beers = []
 	for url in URLS:
 		soup = bs4(urllib2.urlopen(url).read())
 		print "Found %s Items..." % (total_items(soup))
@@ -36,7 +39,6 @@ def main():
 		## See if there are multiple pages		
 		page = 2
 		while (int(total_items(soup)) > len(items)):
-			print total_items(soup), len(items), page
 			items += get_items(bs4(urllib2.urlopen(url + "&sort=20a&page=%d" % page ).read()))
 			page += 1
 
@@ -46,20 +48,27 @@ def main():
 			entry = c.execute("select * from beers where name = ?", [item['name']]).fetchall()
 			if (len(entry) == 0): # If it doesn't insert it into the data base 
 				c.execute("INSERT INTO beers (last_updated, name, qty, price) VALUES (?, ?, ?, ?)", [now, item['name'], item['qty'], item['price']])
-				print "New beer found! name: %s qty: %d price: %f" % (item['name'], item['qty'], item['price'])
+				new_beers.append({"name":item['name'], "qty":item['qty'], "price":item['price']})
+				# print "New beer found! name: %s qty: %d price: %f" % (item['name'], item['qty'], item['price'])
 			elif (len(entry) == 1): # If it does exist
-				changed = False #Key to see if anything has been changed
-				# Disgusting map of list object to dictionary
-				e = {"name":entry[0][1], "qty":entry[0][2], "price":entry[0][3]}
-				
-				# Loop over the keys
-				for key in e:
+				e = entry[0]
+				# Loop over the keys that are important (not id, time)
+				for key in e.keys()[1:-1]: 
 					if e[key] != item[key]:
-						print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(key, item['name'], str(e[key]), str(item[key]))
-						changed = True
+						if item['name'] in changes.keys():
+							changes[item['name']][key] = [str(e[key]), str(item[key])]
+						else:
+							changes[item['name']] = {key:[str(e[key]), str(item[key])]}
 				c.execute("UPDATE beers SET name=?, qty=?, price=?, last_updated=? WHERE id = ?", [item['name'], item['qty'], item['price'], now, entry[0][0]])
-				if changed == False:
-					print "NOTHING CHANGED for beer %s" %(item['name'])
+		
+
+	# Rendering (should be pulled out into its own function)
+	for item in changes:
+		for attr in changes[item]:
+			if changes[item][attr][0] != changes[item][attr][1]:
+				print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(attr, item, changes[item][attr][0], changes[item][attr][1])
+	for beer in new_beers:
+		print "New beer found! name: %s qty: %d price: %f" % (beer['name'], beer['qty'], beer['price'])
 
 	conn.commit()
 	conn.close()

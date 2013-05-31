@@ -7,3 +7,4 @@ Used to scrape [Etre Gourmet](www.bieresgourmet.be) in order to alert beer degen
 * Make my code not a complete trainwreck
 * Set up email integration
 * Write unit tests
+* Write error handling
