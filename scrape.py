@@ -46,7 +46,7 @@ def main():
 		print "Found %s Items..." % (total_items(soup))
 		items = get_items(soup)
 
-		## See if there are multiple pages		
+		# See if there are multiple pages		
 		page = 2
 		while (int(total_items(soup)) > len(items)):
 			items += get_items(bs4(urllib2.urlopen(url + "&sort=20a&page=%d" % page ).read()))
