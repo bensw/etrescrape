@@ -63,6 +63,7 @@ def main():
 		
 
 	# Rendering (should be pulled out into its own function)
+	# Something like render(changes, beer)
 	for item in changes:
 		for attr in changes[item]:
 			if changes[item][attr][0] != changes[item][attr][1]:
