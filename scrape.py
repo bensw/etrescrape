@@ -35,16 +35,21 @@ def render(changes, new_beers):
 
 
 def main():
+
 	now = str(datetime.datetime.now())
 	conn = sqlite3.connect("scrape.db")
 	conn.row_factory=sqlite3.Row
+	
 	c = conn.cursor()
 	changes = {}
 	new_beers = []
+	items = []
+
+	# Add beers to items from each url
 	for url in URLS:
 		soup = bs4(urllib2.urlopen(url).read())
 		print "Found %s Items..." % (total_items(soup))
-		items = get_items(soup)
+		items += get_items(soup)
 
 		# See if there are multiple pages		
 		page = 2
@@ -52,24 +57,24 @@ def main():
 			items += get_items(bs4(urllib2.urlopen(url + "&sort=20a&page=%d" % page ).read()))
 			page += 1
 
-		# Loop over beers found
-		for item in items:
-			# See if the beer exists in the database
-			entry = c.execute("SELECT * FROM beers WHERE name = ?", [item['name']]).fetchall()
-			if (len(entry) == 0): # If it doesn't insert it into the data base 
-				c.execute("INSERT INTO beers (last_updated, name, qty, price) VALUES (?, ?, ?, ?)", [now, item['name'], item['qty'], item['price']])
-				new_beers.append({"name":item['name'], "qty":item['qty'], "price":item['price']})
-				# print "New beer found! name: %s qty: %d price: %f" % (item['name'], item['qty'], item['price'])
-			elif (len(entry) == 1): # If it does exist
-				e = entry[0]
-				# Loop over the keys that are important (not id, time)
-				for key in e.keys()[1:-1]: 
-					if e[key] != item[key]:
-						if item['name'] in changes.keys():
-							changes[item['name']][key] = [str(e[key]), str(item[key])]
-						else:
-							changes[item['name']] = {key:[str(e[key]), str(item[key])]}
-				c.execute("UPDATE beers SET name=?, qty=?, price=?, last_updated=? WHERE id = ?", [item['name'], item['qty'], item['price'], now, entry[0][0]])
+	# Loop over beers found
+	for item in items:
+		# See if the beer exists in the database
+		entry = c.execute("SELECT * FROM beers WHERE name = ?", [item['name']]).fetchall()
+		if (len(entry) == 0): # If it doesn't insert it into the data base 
+			c.execute("INSERT INTO beers (last_updated, name, qty, price) VALUES (?, ?, ?, ?)", [now, item['name'], item['qty'], item['price']])
+			new_beers.append({"name":item['name'], "qty":item['qty'], "price":item['price']})
+			# print "New beer found! name: %s qty: %d price: %f" % (item['name'], item['qty'], item['price'])
+		elif (len(entry) == 1): # If it does exist
+			e = entry[0]
+			# Loop over the keys that are important (not id, time)
+			for key in e.keys()[1:-1]: 
+				if e[key] != item[key]:
+					if item['name'] in changes.keys():
+						changes[item['name']][key] = [str(e[key]), str(item[key])]
+					else:
+						changes[item['name']] = {key:[str(e[key]), str(item[key])]}
+			c.execute("UPDATE beers SET name=?, qty=?, price=?, last_updated=? WHERE id = ?", [item['name'], item['qty'], item['price'], now, entry[0][0]])
 		
 
 	# Rendering
