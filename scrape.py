@@ -24,6 +24,16 @@ def get_items(soup):
 		r.append(item)
 	return r
 
+
+def render(changes, new_beers):
+	for item in changes:
+		for attr in changes[item]:
+			if changes[item][attr][0] != changes[item][attr][1]:
+				print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(attr, item, changes[item][attr][0], changes[item][attr][1])
+	for beer in new_beers:
+		print "New beer found! name: %s qty: %d price: %f" % (beer['name'], beer['qty'], beer['price'])
+
+
 def main():
 	now = str(datetime.datetime.now())
 	conn = sqlite3.connect("scrape.db")
@@ -62,15 +72,10 @@ def main():
 				c.execute("UPDATE beers SET name=?, qty=?, price=?, last_updated=? WHERE id = ?", [item['name'], item['qty'], item['price'], now, entry[0][0]])
 		
 
-	# Rendering (should be pulled out into its own function)
-	# Something like render(changes, beer)
-	for item in changes:
-		for attr in changes[item]:
-			if changes[item][attr][0] != changes[item][attr][1]:
-				print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(attr, item, changes[item][attr][0], changes[item][attr][1])
-	for beer in new_beers:
-		print "New beer found! name: %s qty: %d price: %f" % (beer['name'], beer['qty'], beer['price'])
+	# Rendering
+	render(changes, new_beers)
 
+	# Commit and close the db cursor
 	conn.commit()
 	conn.close()
 
