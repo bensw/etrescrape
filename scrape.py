@@ -45,7 +45,7 @@ def main():
 		# Loop over beers found
 		for item in items:
 			# See if the beer exists in the database
-			entry = c.execute("select * from beers where name = ?", [item['name']]).fetchall()
+			entry = c.execute("SELECT * FROM beers WHERE name = ?", [item['name']]).fetchall()
 			if (len(entry) == 0): # If it doesn't insert it into the data base 
 				c.execute("INSERT INTO beers (last_updated, name, qty, price) VALUES (?, ?, ?, ?)", [now, item['name'], item['qty'], item['price']])
 				new_beers.append({"name":item['name'], "qty":item['qty'], "price":item['price']})
