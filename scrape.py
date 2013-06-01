@@ -4,8 +4,8 @@ import re
 import sqlite3
 import datetime
 from amazon_ses import AmazonSES, EmailMessage
-from aws_credentials import *
-from email_list import *
+from aws_credentials_secret import *
+from email_list_secret import *
 
 """CREATE TABLE beers (id INTEGER PRIMARY KEY, name text, qty real, price real,last_updated text);"""
 
