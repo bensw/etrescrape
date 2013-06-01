@@ -39,9 +39,10 @@ def render(changes, new_beers):
 			if changes[item][attr][0] != changes[item][attr][1]:
 				bodyText += "%s CHANGED FOR %s!!! WAS %s NOW IS %s \n" %(attr, item, changes[item][attr][0], changes[item][attr][1])
 	for beer in new_beers:
-		print "New beer found! name: %s qty: %d price: %f \n" % (beer['name'], beer['qty'], beer['price'])
-	message.bodyText = bodyText
-	result = amazonSes.sendEmail(MYEMAIL, EMAILS, message)
+		bodyText += "New beer found! name: %s qty: %d price: %f \n" % (beer['name'], beer['qty'], beer['price'])
+	if bodyText != "":
+		message.bodyText = bodyText
+		result = amazonSes.sendEmail(MYEMAIL, EMAILS, message)
 
 def main():
 
