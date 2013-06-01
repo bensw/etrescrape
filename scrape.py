@@ -3,6 +3,9 @@ import urllib2
 import re
 import sqlite3
 import datetime
+from amazon_ses import AmazonSES, EmailMessage
+from aws_credentials import *
+from email_list import *
 
 """CREATE TABLE beers (id INTEGER PRIMARY KEY, name text, qty real, price real,last_updated text);"""
 
@@ -26,13 +29,19 @@ def get_items(soup):
 
 
 def render(changes, new_beers):
+	amazonSes = AmazonSES(ACCESSKEYID, SECRETACCESSKEY)
+	message = EmailMessage()
+	message.subject = "Etre Gourmet Update!"
+	bodyText = ''
+
 	for item in changes:
 		for attr in changes[item]:
 			if changes[item][attr][0] != changes[item][attr][1]:
-				print "%s CHANGED FOR %s!!! WAS %s NOW IS %s" %(attr, item, changes[item][attr][0], changes[item][attr][1])
+				bodyText += "%s CHANGED FOR %s!!! WAS %s NOW IS %s \n" %(attr, item, changes[item][attr][0], changes[item][attr][1])
 	for beer in new_beers:
-		print "New beer found! name: %s qty: %d price: %f" % (beer['name'], beer['qty'], beer['price'])
-
+		print "New beer found! name: %s qty: %d price: %f \n" % (beer['name'], beer['qty'], beer['price'])
+	message.bodyText = bodyText
+	result = amazonSes.sendEmail(MYEMAIL, EMAILS, message)
 
 def main():
 
