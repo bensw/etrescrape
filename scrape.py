@@ -43,6 +43,9 @@ def render(changes, new_beers):
 	if bodyText != "":
 		message.bodyText = bodyText
 		result = amazonSes.sendEmail(MYEMAIL, EMAILS, message)
+		print "Sent %s from %s to %s" % (bodyText, MYEMAIL, EMAILS)
+	else:
+		print "No Message Sent"
 
 def main():
 
