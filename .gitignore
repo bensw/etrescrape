@@ -2,4 +2,5 @@ scrape.db
 amazon_ses.py
 *.pyc
 *_secret.py
+*~
 
