@@ -50,7 +50,7 @@ def render(changes, new_beers):
 def main():
 
 	now = str(datetime.datetime.now())
-	conn = sqlite3.connect("scrape.db")
+	conn = sqlite3.connect(DIR + "scrape.db")
 	conn.row_factory=sqlite3.Row
 	
 	c = conn.cursor()
