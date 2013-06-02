@@ -3,8 +3,7 @@ import urllib2
 import re
 import sqlite3
 import datetime
-from amazon_ses import AmazonSES, EmailMessage
-from aws_credentials_secret import *
+import boto.ses
 from email_list_secret import *
 
 """CREATE TABLE beers (id INTEGER PRIMARY KEY, name text, qty real, price real,last_updated text);"""
@@ -29,9 +28,11 @@ def get_items(soup):
 
 
 def render(changes, new_beers):
-	amazonSes = AmazonSES(ACCESSKEYID, SECRETACCESSKEY)
-	message = EmailMessage()
-	message.subject = "Etre Gourmet Update!"
+	connection = boto.ses.connect_to_region('us-east-1')
+	if connection == None:
+		print "Couldn't connect to SES"
+		return
+	subject = "Etre Gourmet Update!"
 	bodyText = ''
 
 	for item in changes:
@@ -41,8 +42,7 @@ def render(changes, new_beers):
 	for beer in new_beers:
 		bodyText += "New beer found! name: %s qty: %d price: %f \n" % (beer['name'], beer['qty'], beer['price'])
 	if bodyText != "":
-		message.bodyText = bodyText
-		result = amazonSes.sendEmail(MYEMAIL, EMAILS, message)
+		connection.send_email(MYEMAIL, subject, bodyText, EMAILS)
 
 def main():
 
