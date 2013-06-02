@@ -43,11 +43,14 @@ def render(changes, new_beers):
 		bodyText += "New beer found! name: %s qty: %d price: %f \n" % (beer['name'], beer['qty'], beer['price'])
 	if bodyText != "":
 		connection.send_email(MYEMAIL, subject, bodyText, EMAILS)
+	else:
+		print "No Message Sent"
+
 
 def main():
 
 	now = str(datetime.datetime.now())
-	conn = sqlite3.connect("scrape.db")
+	conn = sqlite3.connect(DIR + "scrape.db")
 	conn.row_factory=sqlite3.Row
 	
 	c = conn.cursor()
