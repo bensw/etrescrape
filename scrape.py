@@ -38,9 +38,15 @@ def render(changes, new_beers):
 	for item in changes:
 		for attr in changes[item]:
 			if changes[item][attr][0] != changes[item][attr][1]:
-				bodyText += "%s CHANGED FOR %s!!! WAS %s NOW IS %s \n" %(attr, item, changes[item][attr][0], changes[item][attr][1])
+				if attr == "qty":
+					if changes[item][attr][1] == 0:
+						bodyText += "%s is now SOLD OUT!\n" % (item)
+					elif changes[item][attr][0] < changes[item][attr][1]:
+						bodyText += "Quantity INCREASED for %s, now %s in stock!\n" % (item, changes[item][attr][1])
+				else:
+					bodyText += "%s CHANGED FOR %s!!! WAS %s NOW IS %s \n" %(attr, item, changes[item][attr][0], changes[item][attr][1])
 	for beer in new_beers:
-		bodyText += "New beer found! name: %s qty: %d price: %f \n" % (beer['name'], beer['qty'], beer['price'])
+		bodyText += "New beer found! There are %d %s at %f euros!\n" % (beer['qty'], beer['name'], beer['price'])
 	if bodyText != "":
 		connection.send_email(MYEMAIL, subject, bodyText, EMAILS)
 	else:
