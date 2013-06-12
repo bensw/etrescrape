@@ -45,7 +45,7 @@ def render(changes, new_beers):
 					elif changes[item][attr][0] < changes[item][attr][1]:
 						bodyText += "Quantity INCREASED for %s, now %s in stock!\n" % (item, changes[item][attr][1])
 				else:
-					bodyText += "%s CHANGED FOR %s!!! WAS %s NOW IS %s \n" %(attr, item, changes[item][attr][0], changes[item][attr][1])
+					bodyText += "%s CHANGED FOR %s!!! WAS %s NOW IS %s \n" %(attr.title(), item, changes[item][attr][0], changes[item][attr][1])
 	for beer in new_beers:
 		bodyText += "New beer found! There are %d %s at %f euros!\n" % (beer['qty'], beer['name'], beer['price'])
 	if bodyText != "":
