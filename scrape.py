@@ -9,9 +9,9 @@ from email_list_secret import *
 """CREATE TABLE beers (id INTEGER PRIMARY KEY, name text, qty real, price real,last_updated text);"""
 
 URLS = ["http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=14", # Cantillon
-		"http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=3", #3F
-	"http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=66" ] #Tilquin
-
+        "http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=3", #3F
+	"http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=66", #Tilquin
+	"http://www.bieresgourmet.be/catalog/index.php?main_page=index&manufacturers_id=10"] #Struise
 def total_items(soup):
 	return soup.select("#productsListingTopNumber")[0].select("strong:nth-of-type(3)")[0].text
 
