@@ -7,6 +7,5 @@ Run using a cronjob using boto for SES integration.
 
 ###TODO
 * Make my code not a complete trainwreck
-* Add URLs to emails
 * Write unit tests
 * Write error handling
